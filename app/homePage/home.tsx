@@ -1,7 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
     SafeAreaView,
     ScrollView,
@@ -12,15 +10,22 @@ import {
 } from 'react-native';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
+import DrawerMenu from '../../components/Menu/DrawerMenu';
+import Menu from '../../components/Menu/MenuButton';
 
 export default function Home() {
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
   const handleStartSensorama = () => {
     console.log('Iniciar Sensorama');
   };
 
   const handleMenuPress = () => {
-    // Abrir menu lateral
-    console.log('Menu pressed');
+    setIsMenuVisible(true);
+  };
+
+  const handleCloseMenu = () => {
+    setIsMenuVisible(false);
   };
 
   const handleViewCompleteList = () => {
@@ -38,12 +43,10 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-        <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <Header/>
-        <TouchableOpacity style={styles.menuButton} onPress={handleMenuPress}>
-          <Ionicons name="menu" size={45} color="white" />
-        </TouchableOpacity>
+      <Header />
+      <Menu onPress={handleMenuPress} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
@@ -98,7 +101,14 @@ export default function Home() {
           <Text style={styles.startButtonText}>INICIAR SENSORAMA</Text>
         </TouchableOpacity>
       </View>
+
       <Footer />
+
+      {/* Drawer Menu */}
+      <DrawerMenu 
+        isVisible={isMenuVisible} 
+        onClose={handleCloseMenu} 
+      />
     </SafeAreaView>
   );
 }
@@ -107,21 +117,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-  },
-  colorBar: {
-    flexDirection: 'row',
-    height: 50,
-  },
-  menuButton: {
-    backgroundColor: '#1a237e',
-    width: '100%',
-    height: 50,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-  },
-  colorSection: {
-    flex: 1,
   },
   content: {
     flex: 1,
