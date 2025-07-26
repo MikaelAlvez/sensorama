@@ -1,75 +1,191 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Login() {
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
 
-export default function HomeScreen() {
+  const handleLogin = () => {
+    if (!user || !password) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      return;
+    }
+    Alert.alert('Login', `Tentativa de login com usuário: ${user}`);
+  };
+
+  const handleRegister = () => {
+    router.push('/auth/register');
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#1a237e" />
+      
+      {/* Header azul */}
+      <View style={styles.header} />
+
+      <View style={styles.content}>
+        <View style={styles.logoSection}>
+          <Image 
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.subtitle}>
+            Uma Nova Maneira de Jogar e Aprender{'\n'}
+            Quiz Interativo com Áudio e Imagem{'\n'}
+          </Text>
+        </View>
+
+        <View style={styles.formSection}>
+          <Text style={styles.label}>Usuário</Text>
+          <TextInput
+            style={styles.input}
+            value={user}
+            onChangeText={setUser}
+            placeholder=""
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="username"
+          />
+
+          <Text style={styles.label}>Senha</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            placeholder=""
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="current-password"
+          />
+
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>LOGIN</Text>
+          </TouchableOpacity>
+
+          <View style={styles.registerSection}>
+            <Text style={styles.registerText}>Não tem uma conta? </Text>
+            <TouchableOpacity onPress={handleRegister}>
+              <Text style={styles.registerLink}>Cadastre-se</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      {/* Footer azul */}
+      <View style={styles.footer} />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    height: 60,
+    backgroundColor: '#1a237e',
+  },
+  footer: {
+    height: 60,
+    backgroundColor: '#1a237e',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingVertical: 40,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
+  logoSection: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 300,
+    height: 300,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#666666',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  formSection: {
+    width: '100%',
+  },
+  label: {
+    fontSize: 16,
+    color: '#1a237e',
     marginBottom: 8,
+    fontWeight: '500',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 4,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 20,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  loginButton: {
+    backgroundColor: '#1a237e',
+    paddingVertical: 15,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  loginButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  registerSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  registerText: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  registerLink: {
+    fontSize: 14,
+    color: '#1a237e',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });
