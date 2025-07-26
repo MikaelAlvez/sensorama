@@ -98,7 +98,7 @@ export default function DrawerMenu({ isVisible, onClose }: DrawerMenuProps) {
                   <Ionicons name="chevron-forward" size={20} color="#ccc" />
                 </TouchableOpacity>
 
-                {/* Configurações */}
+                {/* Configurações
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={() => handleMenuItemPress('/settings')}
@@ -106,7 +106,7 @@ export default function DrawerMenu({ isVisible, onClose }: DrawerMenuProps) {
                   <Ionicons name="settings-outline" size={24} color="#333" style={styles.menuIcon} />
                   <Text style={styles.menuText}>Configurações</Text>
                   <Ionicons name="chevron-forward" size={20} color="#ccc" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 {/* Sobre */}
                 <TouchableOpacity

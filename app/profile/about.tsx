@@ -66,7 +66,7 @@ export default function About() {
       role: "Desenvolvedora Backend",
       github: "https://github.com/L-Rock-C",
       email: "lucas.cardoso45219@alunos.ufersa.edu.br ",
-      photo: require('../../assets/images/lucasrock.png') // Substitua pelo caminho correto
+      photo: require('../../assets/images/lucasrock.png')
     },
   ];
 
