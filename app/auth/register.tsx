@@ -1,15 +1,17 @@
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import Footer from '../../components/Footer/Footer';
+import Header from '../../components/Header/Header';
 
 export default function SensoramaRegister() {
   const [user, setUser] = useState('');
@@ -52,8 +54,7 @@ export default function SensoramaRegister() {
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#1a237e" />
         
-        {/* Header azul */}
-        <View style={styles.header} />
+        <Header/>
 
         <View style={styles.content}>
           <View style={styles.titleSection}>
@@ -125,8 +126,7 @@ export default function SensoramaRegister() {
           </View>
         </View>
 
-        {/* Footer azul */}
-        <View style={styles.footer} />
+        <Footer/>
       </SafeAreaView>
     </>
   );

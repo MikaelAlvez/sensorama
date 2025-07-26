@@ -4,13 +4,14 @@ import {
   Alert,
   Image,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Footer from '../../components/Footer/Footer';
+import Header from '../../components/Header/Header';
 
 export default function Login() {
   const [user, setUser] = useState('');
@@ -30,10 +31,7 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1a237e" />
-      
-      {/* Header azul */}
-      <View style={styles.header} />
+      <Header />
 
       <View style={styles.content}>
         <View style={styles.logoSection}>
@@ -85,8 +83,7 @@ export default function Login() {
         </View>
       </View>
 
-      {/* Footer azul */}
-      <View style={styles.footer} />
+      <Footer />
     </SafeAreaView>
   );
 }
@@ -95,14 +92,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-  },
-  header: {
-    height: 60,
-    backgroundColor: '#1a237e',
-  },
-  footer: {
-    height: 60,
-    backgroundColor: '#1a237e',
   },
   content: {
     flex: 1,
