@@ -22,7 +22,6 @@ export default function Login() {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
-    Alert.alert('Login', `Tentativa de login com usuário: ${user}`);
     router.push('/homePage/home');
 
   };

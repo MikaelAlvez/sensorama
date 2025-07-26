@@ -68,7 +68,6 @@ export default function Profile() {
           </View>
         </View>
 
-        {/* Form Section */}
         <View style={styles.formSection}>
           <Text style={styles.label}>Usuário</Text>
           <TextInput
@@ -98,8 +97,6 @@ export default function Profile() {
       </View>
 
       <Footer />
-
-      {/* Drawer Menu */}
       <DrawerMenu 
         isVisible={isMenuVisible} 
         onClose={handleCloseMenu} 
