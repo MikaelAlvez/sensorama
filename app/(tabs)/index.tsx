@@ -23,6 +23,8 @@ export default function Login() {
       return;
     }
     Alert.alert('Login', `Tentativa de login com usuário: ${user}`);
+    router.push('/homePage/home');
+
   };
 
   const handleRegister = () => {
@@ -104,14 +106,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 300,
-    height: 300,
+    width: 325,
+    height: 325,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#666666',
+    fontSize: 19,
+    color: '#1a237e',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 25,
+    fontWeight: 'bold',
   },
   formSection: {
     width: '100%',
