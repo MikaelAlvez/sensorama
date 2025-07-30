@@ -12,8 +12,8 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import Footer from '../../components/Footer/Footer';
-import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/FooterBlue';
+import Header from '../../components/Header/HeaderBlue';
 
 const CategorySelectionScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('');

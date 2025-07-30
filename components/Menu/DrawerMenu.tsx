@@ -2,12 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 
 interface DrawerMenuProps {
@@ -61,7 +61,11 @@ export default function DrawerMenu({ isVisible, onClose }: DrawerMenuProps) {
                 {/* Meus Sensoramas */}
                 <TouchableOpacity
                   style={styles.menuItem}
-                  onPress={() => handleMenuItemPress('/homePage/home')}
+                  //onPress={() => handleMenuItemPress('/questions/objectQuestion')}
+                  //onPress={() => handleMenuItemPress('/questions/pixeladoQuestion')}
+                  //onPress={() => handleMenuItemPress('/questions/mindMapQuestion')}
+                  onPress={() => handleMenuItemPress('/questions/zomPuzzleQuestion')}
+                  //onPress={() => handleMenuItemPress('/questions/ecoLogicalQuestion')}
                 >
                   <Ionicons name="game-controller-outline" size={24} color="#333" style={styles.menuIcon} />
                   <Text style={styles.menuText}>Meus Sensoramas</Text>
