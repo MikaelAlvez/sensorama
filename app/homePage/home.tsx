@@ -1,12 +1,12 @@
 import { Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import Footer from '../../components/Footer/FooterBlue';
 import Header from '../../components/Header/HeaderBlue';
