@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import React from 'react';
 import {
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import RainbowBackground from '../../components/Rainbow/rainbow';
 
@@ -21,9 +21,25 @@ interface VitoriaScreenProps {
 const VitoriaScreen: React.FC<VitoriaScreenProps> = ({
   score = 85,
   totalQuestions = 10,
-  onContinue = () => console.log('Continue pressed'),
-  onRestart = () => console.log('Restart pressed')
+  onContinue,
+  onRestart
 }) => {
+
+  const handleContinue = () => {
+    if (onContinue) {
+      onContinue();
+    } else {
+      router.push('/homePage/home');
+    }
+  };
+
+  const handleRestart = () => {
+    if (onRestart) {
+      onRestart();
+    } else {
+      router.back();
+    }
+  };
 
   const Crown = () => (
     <View style={styles.crownContainer}>
@@ -71,12 +87,12 @@ const VitoriaScreen: React.FC<VitoriaScreenProps> = ({
           
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
+            <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
               <Ionicons name="refresh" size={20} color="#1a237e" />
               <Text style={styles.restartButtonText}>Jogar Novamente</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
+            <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
               <Text style={styles.continueButtonText}>Continuar</Text>
             </TouchableOpacity>
           </View>
