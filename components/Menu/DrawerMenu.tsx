@@ -67,6 +67,8 @@ export default function DrawerMenu({ isVisible, onClose }: DrawerMenuProps) {
                   //onPress={() => handleMenuItemPress('/questions/zomPuzzleQuestion')}
                   //onPress={() => handleMenuItemPress('/questions/ecoLogicalQuestion')}
                   onPress={() => handleMenuItemPress('/sensorama/victory')}
+                  //onPress={() => handleMenuItemPress('/sensorama/defeat')}
+
                 >
                   <Ionicons name="game-controller-outline" size={24} color="#333" style={styles.menuIcon} />
                   <Text style={styles.menuText}>Meus Sensoramas</Text>
