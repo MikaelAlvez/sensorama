@@ -88,7 +88,7 @@ export default function DrawerMenu({ isVisible, onClose }: DrawerMenuProps) {
                 {/* Ranking */}
                 <TouchableOpacity
                   style={styles.menuItem}
-                  onPress={() => handleMenuItemPress('/homePage/home')}
+                  onPress={() => handleMenuItemPress('/ranking/ranking')}
                 >
                   <Ionicons name="trophy-outline" size={24} color="#333" style={styles.menuIcon} />
                   <Text style={styles.menuText}>Ranking</Text>
