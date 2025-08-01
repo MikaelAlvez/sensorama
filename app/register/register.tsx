@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
   FlatList,
+  Image,
   Modal,
   Platform,
   SafeAreaView,
@@ -33,6 +35,7 @@ export default function SensoramaRegister() {
   const [cpf, setCpf] = useState('');
   const [role, setRole] = useState('');
   const [status, setStatus] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
   
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showStateModal, setShowStateModal] = useState(false);
@@ -157,8 +160,84 @@ export default function SensoramaRegister() {
     router.push('/(tabs)');
   };
 
-  const handleImagePicker = () => {
-    Alert.alert('Foto de Perfil', 'Funcionalidade será implementada após instalar expo-image-picker');
+  const handleImagePicker = async () => {
+    try {
+      // Solicitar permissões
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permissão necessária',
+          'Precisamos de permissão para acessar sua galeria de fotos.'
+        );
+        return;
+      }
+
+      Alert.alert(
+        'Selecionar Foto',
+        'Escolha uma opção:',
+        [
+          {
+            text: 'Câmera',
+            onPress: () => openCamera(),
+          },
+          {
+            text: 'Galeria',
+            onPress: () => openGallery(),
+          },
+          {
+            text: 'Cancelar',
+            style: 'cancel',
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao acessar as imagens.');
+    }
+  };
+
+  const openCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permissão necessária',
+          'Precisamos de permissão para acessar sua câmera.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setProfileImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao abrir a câmera.');
+    }
+  };
+
+  const openGallery = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setProfileImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao abrir a galeria.');
+    }
   };
 
   const SelectionModal = ({ visible, onClose, title, data, onSelect, placeholder }) => (
@@ -223,10 +302,14 @@ export default function SensoramaRegister() {
 
           <View style={styles.formSection}>
             <TouchableOpacity style={styles.imagePickerContainer} onPress={handleImagePicker}>
-              <View style={styles.imagePlaceholder}>
-                <Text style={styles.imagePlaceholderText}>+</Text>
-                <Text style={styles.imagePlaceholderSubtext}>Foto de perfil</Text>
-              </View>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Text style={styles.imagePlaceholderText}>+</Text>
+                  <Text style={styles.imagePlaceholderSubtext}>Foto de perfil</Text>
+                </View>
+              )}
             </TouchableOpacity>
 
             <Text style={styles.label}>Usuário</Text>
@@ -589,6 +672,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666666',
     marginTop: 5,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#1a237e',
   },
   // Modal styles
   modalOverlay: {
