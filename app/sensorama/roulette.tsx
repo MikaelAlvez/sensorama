@@ -1,6 +1,7 @@
-import FooterBlue from '@/components/Footer/FooterBlue';
+import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
+
 import {
     Animated,
     Dimensions,
@@ -55,6 +56,10 @@ export default function RouletteScreen() {
         return;
     }
     router.push(route);
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   const spinWheel = () => {
@@ -184,7 +189,7 @@ export default function RouletteScreen() {
           <Text style={styles.resultGame}>{selectedGame.name}</Text>
         </View>
       )}
-
+    <View style={styles.buttonsContainer}>
       <TouchableOpacity
         style={[styles.spinButton, isSpinning && styles.spinButtonDisabled]}
         onPress={spinWheel}
@@ -194,7 +199,11 @@ export default function RouletteScreen() {
           {isSpinning ? 'GIRANDO...' : 'GIRAR ROLETA'}
         </Text>
       </TouchableOpacity>
-      <FooterBlue />
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+            <Ionicons name="arrow-back" size={20} color="#1a237e" />
+              <Text style={styles.backButtonText}>Voltar</Text>
+        </TouchableOpacity>
+    </View>
     </SafeAreaView>
   );
 }
@@ -291,5 +300,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
+  backButton: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#1a237e',
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#1a237e',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
