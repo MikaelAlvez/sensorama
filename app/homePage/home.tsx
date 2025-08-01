@@ -18,7 +18,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleStartSensorama = () => {
-    console.log('Iniciar Sensorama');
+    router.push ('/sensorama/roulette');
   };
 
   const handleMenuPress = () => {
