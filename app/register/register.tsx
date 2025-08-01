@@ -21,6 +21,8 @@ import {
 } from 'react-native';
 import Footer from '../../components/Footer/FooterBlue';
 import Header from '../../components/Header/HeaderBlue';
+import authService from '../../services/authService';
+import { ApiError, UserRegistrationRequest } from '../../types/api';
 
 export default function SensoramaRegister() {
   const [user, setUser] = useState('');
@@ -248,7 +250,9 @@ export default function SensoramaRegister() {
     setCity(selectedCity);
   };
 
-  const handleRegister = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async () => {
     if (!user || !email || !password || !confirmPassword || !country || !state || !city || !gender || !phone || !cpf || !role || !status) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
@@ -279,7 +283,37 @@ export default function SensoramaRegister() {
       return;
     }
 
-    Alert.alert('Cadastro', `Cadastro realizado com sucesso!\nUsuário: ${user}\nEmail: ${email}\nGênero: ${gender}\nTelefone: ${phone}\nData de Nascimento: ${formatDate(birthDate)}\nCPF: ${cpf}\nPaís: ${country}\nEstado: ${state}\nCidade: ${city}\nPapel: ${role}\nStatus: ${status}`);
+    setLoading(true);
+
+    try {
+      const registrationData: UserRegistrationRequest = {
+        username: user,
+        email,
+        password,
+        // Adicione outros campos conforme necessário para o DTO do backend
+      };
+
+      await authService.register(registrationData);
+      
+      Alert.alert(
+        'Sucesso', 
+        'Cadastro realizado com sucesso!',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.push('/(tabs)')
+          }
+        ]
+      );
+    } catch (error) {
+      const apiError = error as ApiError;
+      Alert.alert(
+        'Erro no Cadastro', 
+        apiError.message || 'Erro desconhecido. Tente novamente.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = () => {

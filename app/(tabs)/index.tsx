@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   Image,
@@ -12,18 +12,68 @@ import {
 } from 'react-native';
 import Footer from '../../components/Footer/FooterBlue';
 import Header from '../../components/Header/HeaderBlue';
+import authService from '../../services/authService';
+import { ApiError } from '../../types/api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Login() {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login, isAuthenticated, isLoading } = useAuth();
 
-  const handleLogin = () => {
+  // Redireciona para home se já estiver autenticado
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/homePage/home');
+    }
+  }, [isAuthenticated, isLoading]);
+
+  const handleLogin = async () => {
     if (!user || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
-    router.push('/homePage/home');
 
+    setLoading(true);
+    
+    try {
+      // Faz o login via API
+      const response = await authService.login(user, password);
+      
+      // Salva no contexto (que salva no AsyncStorage)
+      await login(response);
+      
+      // Busca dados do perfil do usuário
+      try {
+        const userProfile = await authService.getUserProfile();
+        console.log('Perfil do usuário carregado:', userProfile);
+      } catch (profileError) {
+        console.warn('Não foi possível carregar o perfil do usuário:', profileError);
+        // Não bloqueia o login se falhar ao carregar o perfil
+      }
+      
+      // Login bem-sucedido - navega para home
+      Alert.alert(
+        'Sucesso', 
+        'Login realizado com sucesso!',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.push('/homePage/home')
+          }
+        ]
+      );
+    } catch (error) {
+      // Trata erro da API
+      const apiError = error as ApiError;
+      Alert.alert(
+        'Erro no Login', 
+        apiError.message || 'Erro desconhecido. Tente novamente.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRegister = () => {
@@ -71,8 +121,14 @@ export default function Login() {
             autoComplete="current-password"
           />
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>LOGIN</Text>
+          <TouchableOpacity 
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.loginButtonText}>
+              {loading ? 'ENTRANDO...' : 'LOGIN'}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.registerSection}>
@@ -157,6 +213,10 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+  },
+  loginButtonDisabled: {
+    backgroundColor: '#9e9e9e',
+    elevation: 0,
   },
   loginButtonText: {
     color: '#ffffff',

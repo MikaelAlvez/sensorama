@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Image,
@@ -19,7 +19,7 @@ export default function Profile() {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
-  const [profileImage, setProfileImage] = useState(null); 
+  const [profileImage] = useState(null); 
 
   const handleMenuPress = () => {
     setIsMenuVisible(true);
@@ -30,7 +30,7 @@ export default function Profile() {
   };
 
   const handleEditPress = () => {
-    console.log('Editar perfil:', { user, password });
+    router.push('/profile/editProfile');
   };
 
   const handleChangePhoto = () => {
