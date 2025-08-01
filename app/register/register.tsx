@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
   FlatList,
   Modal,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -25,17 +27,100 @@ export default function SensoramaRegister() {
   const [country, setCountry] = useState('');
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
+  const [gender, setGender] = useState('');
+  const [phone, setPhone] = useState('');
+  const [birthDate, setBirthDate] = useState(new Date());
+  const [cpf, setCpf] = useState('');
+  const [role, setRole] = useState('');
+  const [status, setStatus] = useState('');
   
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showStateModal, setShowStateModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
+  const [showGenderModal, setShowGenderModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const countries = ['Brasil', 'Argentina', 'Uruguai', 'Paraguai', 'Chile', 'Bolivia', 'Colombia', 'Venezuela'];
   const states = ['RN', 'CE', 'PB', 'MA', 'PE', 'BA', 'PI', 'AL'];
   const cities = ['Mossoró', 'Natal'];
+  const genders = ['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'];
+  const roles = ['DEV', 'ADMIN', 'USER'];
+  const statuses = ['ACTIVE', 'INACTIVE'];
+
+  // Função para formatar telefone
+  const formatPhone = (text) => {
+    const cleaned = text.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+    if (match) {
+      return `${match[1]} ${match[2]}-${match[3]}`;
+    }
+    return text;
+  };
+
+  // Função para formatar CPF
+  const formatCPF = (text) => {
+    const cleaned = text.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{3})(\d{2})$/);
+    if (match) {
+      return `${match[1]}.${match[2]}.${match[3]}-${match[4]}`;
+    }
+    return text;
+  };
+
+  // Função para validar CPF
+  const isValidCPF = (cpf) => {
+    const cleaned = cpf.replace(/\D/g, '');
+    if (cleaned.length !== 11) return false;
+    
+    // Verifica se todos os dígitos são iguais
+    if (/^(\d)\1+$/.test(cleaned)) return false;
+    
+    // Validação dos dígitos verificadores
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cleaned[i]) * (10 - i);
+    }
+    let firstDigit = 11 - (sum % 11);
+    if (firstDigit >= 10) firstDigit = 0;
+    
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cleaned[i]) * (11 - i);
+    }
+    let secondDigit = 11 - (sum % 11);
+    if (secondDigit >= 10) secondDigit = 0;
+    
+    return firstDigit === parseInt(cleaned[9]) && secondDigit === parseInt(cleaned[10]);
+  };
+
+  const handlePhoneChange = (text) => {
+    const cleaned = text.replace(/\D/g, '');
+    if (cleaned.length <= 11) {
+      setPhone(formatPhone(cleaned));
+    }
+  };
+
+  const handleCPFChange = (text) => {
+    const cleaned = text.replace(/\D/g, '');
+    if (cleaned.length <= 11) {
+      setCpf(formatCPF(cleaned));
+    }
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || birthDate;
+    setShowDatePicker(Platform.OS === 'ios');
+    setBirthDate(currentDate);
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('pt-BR');
+  };
 
   const handleRegister = () => {
-    if (!user || !email || !password || !confirmPassword || !country || !state || !city) {
+    if (!user || !email || !password || !confirmPassword || !country || !state || !city || !gender || !phone || !cpf || !role || !status) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
@@ -52,7 +137,20 @@ export default function SensoramaRegister() {
       return;
     }
 
-    Alert.alert('Cadastro', `Cadastro realizado com sucesso!\nUsuário: ${user}\nEmail: ${email}\nPaís: ${country}\nEstado: ${state}\nCidade: ${city}`);
+    // Validação de telefone
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 11) {
+      Alert.alert('Erro', 'Por favor, insira um telefone válido (11 dígitos)');
+      return;
+    }
+
+    // Validação de CPF
+    if (!isValidCPF(cpf)) {
+      Alert.alert('Erro', 'Por favor, insira um CPF válido');
+      return;
+    }
+
+    Alert.alert('Cadastro', `Cadastro realizado com sucesso!\nUsuário: ${user}\nEmail: ${email}\nGênero: ${gender}\nTelefone: ${phone}\nData de Nascimento: ${formatDate(birthDate)}\nCPF: ${cpf}\nPaís: ${country}\nEstado: ${state}\nCidade: ${city}\nPapel: ${role}\nStatus: ${status}`);
   };
 
   const handleLogin = () => {
@@ -153,6 +251,58 @@ export default function SensoramaRegister() {
               autoComplete="email"
             />
 
+            <Text style={styles.label}>Gênero</Text>
+            <TouchableOpacity 
+              style={styles.selectInput} 
+              onPress={() => setShowGenderModal(true)}
+            >
+              <Text style={[styles.selectText, !gender && styles.placeholder]}>
+                {gender || 'Selecione o gênero'}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#666" />
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Telefone</Text>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={handlePhoneChange}
+              placeholder="xx xxxxx-xxxx"
+              keyboardType="numeric"
+              maxLength={13}
+            />
+
+            <Text style={styles.label}>Data de Nascimento</Text>
+            <TouchableOpacity 
+              style={styles.selectInput} 
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={styles.selectText}>
+                {formatDate(birthDate)}
+              </Text>
+              <Ionicons name="calendar" size={20} color="#666" />
+            </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={birthDate}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+                maximumDate={new Date()}
+              />
+            )}
+
+            <Text style={styles.label}>CPF</Text>
+            <TextInput
+              style={styles.input}
+              value={cpf}
+              onChangeText={handleCPFChange}
+              placeholder="xxx.xxx.xxx-xx"
+              keyboardType="numeric"
+              maxLength={14}
+            />
+
             <Text style={styles.label}>País</Text>
             <TouchableOpacity 
               style={styles.selectInput} 
@@ -182,6 +332,28 @@ export default function SensoramaRegister() {
             >
               <Text style={[styles.selectText, !city && styles.placeholder]}>
                 {city || 'Selecione a cidade'}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#666" />
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Papel</Text>
+            <TouchableOpacity 
+              style={styles.selectInput} 
+              onPress={() => setShowRoleModal(true)}
+            >
+              <Text style={[styles.selectText, !role && styles.placeholder]}>
+                {role || 'Selecione o papel'}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#666" />
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Status</Text>
+            <TouchableOpacity 
+              style={styles.selectInput} 
+              onPress={() => setShowStatusModal(true)}
+            >
+              <Text style={[styles.selectText, !status && styles.placeholder]}>
+                {status || 'Selecione o status'}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#666" />
             </TouchableOpacity>
@@ -243,6 +415,27 @@ export default function SensoramaRegister() {
           title="Selecionar Cidade"
           data={cities}
           onSelect={setCity} placeholder={undefined}        />
+
+        <SelectionModal
+          visible={showGenderModal}
+          onClose={() => setShowGenderModal(false)}
+          title="Selecionar Gênero"
+          data={genders}
+          onSelect={setGender} placeholder={undefined}        />
+
+        <SelectionModal
+          visible={showRoleModal}
+          onClose={() => setShowRoleModal(false)}
+          title="Selecionar Papel"
+          data={roles}
+          onSelect={setRole} placeholder={undefined}        />
+
+        <SelectionModal
+          visible={showStatusModal}
+          onClose={() => setShowStatusModal(false)}
+          title="Selecionar Status"
+          data={statuses}
+          onSelect={setStatus} placeholder={undefined}        />
       </SafeAreaView>
     </>
   );
