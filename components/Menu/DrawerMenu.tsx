@@ -61,14 +61,7 @@ export default function DrawerMenu({ isVisible, onClose }: DrawerMenuProps) {
                 {/* Meus Sensoramas */}
                 <TouchableOpacity
                   style={styles.menuItem}
-                  //onPress={() => handleMenuItemPress('/questions/objectQuestion')}
-                  //onPress={() => handleMenuItemPress('/questions/pixeladoQuestion')}
-                  //onPress={() => handleMenuItemPress('/questions/mindMapQuestion')}
-                  //onPress={() => handleMenuItemPress('/questions/zomPuzzleQuestion')}
-                  //onPress={() => handleMenuItemPress('/questions/ecoLogicalQuestion')}
-                  onPress={() => handleMenuItemPress('/sensorama/victory')}
-                  //onPress={() => handleMenuItemPress('/sensorama/defeat')}
-
+                  onPress={() => handleMenuItemPress('/sensorama/mySensorama')}
                 >
                   <Ionicons name="game-controller-outline" size={24} color="#333" style={styles.menuIcon} />
                   <Text style={styles.menuText}>Meus Sensoramas</Text>

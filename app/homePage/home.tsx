@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   SafeAreaView,
@@ -15,6 +15,7 @@ import Menu from '../../components/Menu/MenuButton';
 
 export default function Home() {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const router = useRouter();
 
   const handleStartSensorama = () => {
     console.log('Iniciar Sensorama');
@@ -29,8 +30,7 @@ export default function Home() {
   };
 
   const handleViewCompleteList = () => {
-    // Ver lista completa de sensoramas
-    console.log('Ver lista completa');
+    router.push('/sensorama/mySensorama');
   };
 
   const rankingData = [
@@ -104,7 +104,6 @@ export default function Home() {
 
       <Footer />
 
-      {/* Drawer Menu */}
       <DrawerMenu 
         isVisible={isMenuVisible} 
         onClose={handleCloseMenu} 

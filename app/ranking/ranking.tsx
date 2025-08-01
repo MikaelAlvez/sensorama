@@ -106,7 +106,6 @@ const RankingScreen: React.FC<RankingScreenProps> = ({
       <HeaderBlue />
 
       <View style={styles.content}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <View style={styles.titleContainer}>
             <Ionicons name="podium" size={32} color="#1a237e" />
@@ -126,7 +125,6 @@ const RankingScreen: React.FC<RankingScreenProps> = ({
           />
         </View>
 
-        {/* Action Buttons */}
         <View style={styles.buttonsContainer}>
           <TouchableOpacity 
             style={styles.backButton}
