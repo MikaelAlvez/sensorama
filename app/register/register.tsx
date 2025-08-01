@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { router, Stack } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   Image,
@@ -45,12 +46,122 @@ export default function SensoramaRegister() {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const countries = ['Brasil', 'Argentina', 'Uruguai', 'Paraguai', 'Chile', 'Bolivia', 'Colombia', 'Venezuela'];
-  const states = ['RN', 'CE', 'PB', 'MA', 'PE', 'BA', 'PI', 'AL'];
-  const cities = ['Mossoró', 'Natal'];
+  // Estados para dados das APIs
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedCountryCode, setSelectedCountryCode] = useState('');
+  const [selectedStateCode, setSelectedStateCode] = useState('');
+  
+  // Estados de loading
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
   const genders = ['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'];
   const roles = ['DEV', 'ADMIN', 'USER'];
   const statuses = ['ACTIVE', 'INACTIVE'];
+
+  // Carregar países quando o componente é montado
+  useEffect(() => {
+    loadCountries();
+  }, []);
+
+  // Carregar estados quando um país é selecionado
+  useEffect(() => {
+    if (selectedCountryCode) {
+      loadStates(selectedCountryCode);
+      // Reset state e city quando país muda
+      setState('');
+      setCity('');
+      setSelectedStateCode('');
+      setCities([]);
+    }
+  }, [selectedCountryCode]);
+
+  // Carregar cidades quando um estado é selecionado
+  useEffect(() => {
+    if (selectedStateCode) {
+      loadCities(selectedStateCode);
+      // Reset city quando estado muda
+      setCity('');
+    }
+  }, [selectedStateCode]);
+
+  // Função para carregar países
+  const loadCountries = async () => {
+    setLoadingCountries(true);
+    try {
+      const response = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2');
+      const data = await response.json();
+      
+      // Ordenar países por nome
+      const sortedCountries = data
+        .map(country => ({
+          name: country.name.common,
+          code: country.cca2
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      
+      setCountries(sortedCountries);
+    } catch (error) {
+      console.error('Erro ao carregar países:', error);
+      Alert.alert('Erro', 'Não foi possível carregar a lista de países');
+    } finally {
+      setLoadingCountries(false);
+    }
+  };
+
+  // Função para carregar estados (específico para Brasil)
+  const loadStates = async (countryCode) => {
+    if (countryCode !== 'BR') {
+      // Para outros países, usar uma lista genérica ou API diferente
+      setStates([]);
+      return;
+    }
+
+    setLoadingStates(true);
+    try {
+      const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados');
+      const data = await response.json();
+      
+      // Ordenar estados por nome
+      const sortedStates = data
+        .map(state => ({
+          name: state.nome,
+          code: state.id
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      
+      setStates(sortedStates);
+    } catch (error) {
+      console.error('Erro ao carregar estados:', error);
+      Alert.alert('Erro', 'Não foi possível carregar a lista de estados');
+    } finally {
+      setLoadingStates(false);
+    }
+  };
+
+  // Função para carregar cidades
+  const loadCities = async (stateCode) => {
+    setLoadingCities(true);
+    try {
+      const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${stateCode}/municipios`);
+      const data = await response.json();
+      
+      // Ordenar cidades por nome
+      const sortedCities = data
+        .map(city => city.nome)
+        .sort((a, b) => a.localeCompare(b));
+      
+      setCities(sortedCities);
+    } catch (error) {
+      console.error('Erro ao carregar cidades:', error);
+      Alert.alert('Erro', 'Não foi possível carregar a lista de cidades');
+    } finally {
+      setLoadingCities(false);
+    }
+  };
 
   // Função para formatar telefone
   const formatPhone = (text) => {
@@ -120,6 +231,21 @@ export default function SensoramaRegister() {
 
   const formatDate = (date) => {
     return date.toLocaleDateString('pt-BR');
+  };
+
+  // Handlers para seleção
+  const handleCountrySelect = (selectedCountry) => {
+    setCountry(selectedCountry.name);
+    setSelectedCountryCode(selectedCountry.code);
+  };
+
+  const handleStateSelect = (selectedState) => {
+    setState(selectedState.name);
+    setSelectedStateCode(selectedState.code);
+  };
+
+  const handleCitySelect = (selectedCity) => {
+    setCity(selectedCity);
   };
 
   const handleRegister = () => {
@@ -240,7 +366,7 @@ export default function SensoramaRegister() {
     }
   };
 
-  const SelectionModal = ({ visible, onClose, title, data, onSelect, placeholder }) => (
+  const SelectionModal = ({ visible, onClose, title, data, onSelect, loading, isCountryModal = false, isStateModal = false }) => (
     <Modal
       visible={visible}
       transparent={true}
@@ -256,9 +382,21 @@ export default function SensoramaRegister() {
             </TouchableOpacity>
           </View>
           
-          {data.length === 0 ? (
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#1a237e" />
+              <Text style={styles.loadingText}>Carregando...</Text>
+            </View>
+          ) : data.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Nenhuma opção disponível</Text>
+              <Text style={styles.emptyText}>
+                {isCountryModal 
+                  ? 'Nenhum país disponível' 
+                  : isStateModal 
+                    ? 'Selecione um país primeiro'
+                    : 'Selecione um estado primeiro'
+                }
+              </Text>
             </View>
           ) : (
             <FlatList
@@ -272,7 +410,9 @@ export default function SensoramaRegister() {
                     onClose();
                   }}
                 >
-                  <Text style={styles.modalItemText}>{item}</Text>
+                  <Text style={styles.modalItemText}>
+                    {isCountryModal || isStateModal ? item.name : item}
+                  </Text>
                 </TouchableOpacity>
               )}
             />
@@ -399,24 +539,26 @@ export default function SensoramaRegister() {
 
             <Text style={styles.label}>Estado</Text>
             <TouchableOpacity 
-              style={styles.selectInput} 
-              onPress={() => setShowStateModal(true)}
+              style={[styles.selectInput, !selectedCountryCode && styles.disabledInput]} 
+              onPress={() => selectedCountryCode && setShowStateModal(true)}
+              disabled={!selectedCountryCode}
             >
               <Text style={[styles.selectText, !state && styles.placeholder]}>
-                {state || 'Selecione o estado'}
+                {state || (selectedCountryCode ? 'Selecione o estado' : 'Selecione um país primeiro')}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#666" />
+              <Ionicons name="chevron-down" size={20} color={selectedCountryCode ? "#666" : "#ccc"} />
             </TouchableOpacity>
 
             <Text style={styles.label}>Cidade</Text>
             <TouchableOpacity 
-              style={styles.selectInput} 
-              onPress={() => setShowCityModal(true)}
+              style={[styles.selectInput, !selectedStateCode && styles.disabledInput]} 
+              onPress={() => selectedStateCode && setShowCityModal(true)}
+              disabled={!selectedStateCode}
             >
               <Text style={[styles.selectText, !city && styles.placeholder]}>
-                {city || 'Selecione a cidade'}
+                {city || (selectedStateCode ? 'Selecione a cidade' : 'Selecione um estado primeiro')}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#666" />
+              <Ionicons name="chevron-down" size={20} color={selectedStateCode ? "#666" : "#ccc"} />
             </TouchableOpacity>
 
             <Text style={styles.label}>Papel</Text>
@@ -483,42 +625,50 @@ export default function SensoramaRegister() {
           onClose={() => setShowCountryModal(false)}
           title="Selecionar País"
           data={countries}
-          onSelect={setCountry} placeholder={undefined}        />
+          onSelect={handleCountrySelect}
+          loading={loadingCountries}
+          isCountryModal={true}
+        />
 
         <SelectionModal
           visible={showStateModal}
           onClose={() => setShowStateModal(false)}
           title="Selecionar Estado"
           data={states}
-          onSelect={setState} placeholder={undefined}        />
+          onSelect={handleStateSelect}
+          loading={loadingStates}
+          isStateModal={true}
+        />
 
         <SelectionModal
           visible={showCityModal}
           onClose={() => setShowCityModal(false)}
           title="Selecionar Cidade"
           data={cities}
-          onSelect={setCity} placeholder={undefined}        />
+          onSelect={handleCitySelect}
+          loading={loadingCities}
+        />
 
         <SelectionModal
           visible={showGenderModal}
           onClose={() => setShowGenderModal(false)}
           title="Selecionar Gênero"
           data={genders}
-          onSelect={setGender} placeholder={undefined}        />
+          onSelect={setGender} loading={undefined}        />
 
         <SelectionModal
           visible={showRoleModal}
           onClose={() => setShowRoleModal(false)}
           title="Selecionar Papel"
           data={roles}
-          onSelect={setRole} placeholder={undefined}        />
+          onSelect={setRole} loading={undefined}        />
 
         <SelectionModal
           visible={showStatusModal}
           onClose={() => setShowStatusModal(false)}
           title="Selecionar Status"
           data={statuses}
-          onSelect={setStatus} placeholder={undefined}        />
+          onSelect={setStatus} loading={undefined}        />
       </SafeAreaView>
     </>
   );
@@ -603,6 +753,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  disabledInput: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e0e0e0',
   },
   selectText: {
     fontSize: 16,
@@ -724,5 +878,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     textAlign: 'center',
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 10,
   },
 });
